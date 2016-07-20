@@ -1,0 +1,34 @@
+.help-block{
+    font-weight: normal;
+    color: red;
+    padding: 10px 0px 5px 5px;
+    font-size: 12px;
+}
+.site-header .dropdown.dropdown-typical {
+    float: right;
+}
+
+.jstree-default .jstree-anchor {
+    margin-left: 6px;
+}
+/*.sa-confirm-button-container .confirm{*/
+    /*display: none;*/
+/*}*/
+
+.sweet-alert .sa-confirm-button-container {
+    display: inline-block;
+    position: relative;
+    width: 5px;
+}
+
+.sa-confirm-button-container .confirm{
+    visibility: hidden;
+}
+
+.site-header .site-header-content {
+    width: 93%;
+}
+.filee {
+
+    margin-left: 7px !important;
+}

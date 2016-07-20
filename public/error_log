@@ -1,0 +1,2 @@
+[24-Jun-2016 16:43:50 UTC] PHP Fatal error:  Class 'HTML' not found in /home/vrazern/loginportal.vrazer.net/storage/framework/views/196539ed3a77a385b674f81b9972803ac17d8f6c.php on line 33
+[27-Jun-2016 13:12:09 UTC] PHP Fatal error:  Class 'App\Http\Controllers\Auth\Password' not found in /home/vrazern/loginportal.vrazer.net/app/Http/Controllers/Auth/PasswordController.php on line 50
