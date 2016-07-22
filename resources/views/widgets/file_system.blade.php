@@ -16,10 +16,10 @@
                             <div class="item"><span class="num">1</span>Connection Details</div>
                         </li>
                         <li>
-                            <div class="item"><span class="num">2</span>Selection Of Folders</div>
+                            <div class="item"><span class="num">2</span>Select root folder.</div>
                         </li>
                         <li>
-                            <div class="item"><span class="num">3</span>Third Step</div>
+                            <div class="item"><span class="num">3</span>Completed backup.</div>
                         </li>
                     </ul>
                 </div>
@@ -64,7 +64,7 @@
                             <label class="form-label semibold" for="exampleInput">Host Name</label>
                             <input name="host" type="text" class="form-control"
                                    id="exampleInputEmail1"
-                                   name="exampleInputEmail1" placeholder="Enter Host Name" value="host.vrazer.com">
+                                   name="exampleInputEmail1" placeholder="Enter Host Name" value="host.vrazer.com" >
                         </fieldset>
                     </div>
                     <div class="col-lg-4">
@@ -103,10 +103,7 @@
 
                     <input id="dir" type="hidden" name="dir" value="">
                     {!! Form::close() !!}
-
                 </div>
-
-
             </div>
             <div class="steps-numeric-inner selection-folders">
                 <header class="steps-numeric-title">Selection Of Folders</header>

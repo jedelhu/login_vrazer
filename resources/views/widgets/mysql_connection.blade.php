@@ -1,61 +1,57 @@
-@extends('admin/layouts/admin')
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="content">
+            @if ($errors->any())
+                @foreach($errors->all() as $error)
+                    {{$error}}
+                @endforeach
+            @endif
+            <div id="errors"></div>
+        </div>
+        <section class="box-typical steps-numeric-block">
 
-@section('content')
-
-    <div class="page-content">
-        <div class="container-fluid">
-            <div class="content">
-                @if ($errors->any())
-                    @foreach($errors->all() as $error)
-                        {{$error}}
-                    @endforeach
-                @endif
-                <div id="errors"></div>
-            </div>
-            <section class="box-typical steps-numeric-block">
-
-                <div class="steps-numeric-header">
-                    <div class="steps-numeric-header-in">
-                        <ul>
-                            <li class="active">
-                                <div class="item"><span class="num">1</span>MySQL Connection Details</div>
-                            </li>
-                            <li>
-                                <div class="item"><span class="num">2</span>List of Databases</div>
-                            </li>
-                        </ul>
-                    </div>
+            <div class="steps-numeric-header">
+                <div class="steps-numeric-header-in">
+                    <ul>
+                        <li class="active">
+                            <div class="item"><span class="num">1</span>MySQL Connection Details</div>
+                        </li>
+                        <li>
+                            <div class="item"><span class="num">2</span>List of Databases</div>
+                        </li>
+                    </ul>
                 </div>
+            </div>
 
-                <div class="steps-numeric-inner connection-detail">
-                    <header class="steps-numeric-title">Connection Details</header>
-                    {!! Form::open(['id' => 'form-connection2', 'data-style' => 'sky', 'data-nav' => 'left', 'class' => 'wizard', 'url' => 'mysql']) !!}
+            <div class="steps-numeric-inner connection-detail">
+                <header class="steps-numeric-title">Connection Details</header>
+                {!! Form::open(['id' => 'form-connection2', 'data-style' => 'sky', 'data-nav' => 'left', 'class' => 'wizard', 'url' => 'mysql']) !!}
 
-                    <div class="row">
-                        <div class="col-lg-12" style="margin: 5px 0 15px;">
-                            <div class="col-lg-3">
-                                <div class="radio">
-                                    <input type="radio" name="type" id="radio-1" value="mysql">
-                                    <label for="radio-1">MySQL </label>
+                <div class="row">
+                    <div class="col-lg-12" style="margin: 5px 0 15px;">
+                        <div class="col-lg-3">
+                            <div class="radio">
+                                <input type="radio" name="type" id="radio-1" value="mysql">
+                                <label for="radio-1">MySQL </label>
 
-                                </div>
                             </div>
-                            <div class="col-lg-3">
-                                <div class="radio">
-                                    <input type="radio" name="type" id="radio-2" value="ssh" checked>
-                                    <label for="radio-2">SSH</label>
-
-                                </div>
-                            </div>
-
                         </div>
-                        <div class="col-lg-12">
+                        <div class="col-lg-3">
+                            <div class="radio">
+                                <input type="radio" name="type" id="radio-2" value="ssh" checked>
+                                <label for="radio-2">SSH</label>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12">
                         <div class="col-lg-3">
                             <fieldset class="form-group">
                                 <label class="form-label" for="exampleInput">MySQL Host Address</label>
                                 <input name="host" type="text" class="form-control"
                                        id="exampleInputEmail1"
-                                       name="exampleInputEmail1" placeholder="Enter MySQL Host Address">
+                                       name="exampleInputEmail1" placeholder="Enter Mysql Host Address">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
@@ -79,8 +75,8 @@
                                 <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Enter MySQL Port" name="port" value="3306">
                             </fieldset>
                         </div>
-                        </div>
-                        <div class="col-lg-12 ssh-part">
+                    </div>
+                    <div class="col-lg-12 ssh-part">
 
                         <div class="col-lg-3">
                             <fieldset class="form-group">
@@ -111,34 +107,33 @@
                                 <input type="text" class="form-control" id="exampleInputEmail11" placeholder="Enter SSH Port" name="sshport" value="22">
                             </fieldset>
                         </div>
+                    </div>
+                    {!! Form::close() !!}
+
+                </div>
+
+            </div>
+            <div class="steps-numeric-inner selection-folders">
+                <header class="steps-numeric-title">List of Databases</header>
+                <div class="col-lg-12">
+                    <fieldset>
+                        <div id="tree1" class="jstree jstree-1 jstree-default jstree-default-responsive"
+                             role="tree" aria-activedescendant="j1_1">
                         </div>
-                        {!! Form::close() !!}
-
-                    </div>
-
+                        <div class="clearfix"></div>
+                    </fieldset>
                 </div>
-                <div class="steps-numeric-inner selection-folders">
-                    <header class="steps-numeric-title">List of Databases</header>
-                    <div class="col-lg-12">
-                        <fieldset>
-                            <div id="tree1" class="jstree jstree-1 jstree-default jstree-default-responsive"
-                                 role="tree" aria-activedescendant="j1_1">
-                            </div>
-                            <div class="clearfix"></div>
-                        </fieldset>
-                    </div>
+            </div>
+
+
+            <div class="tbl steps-numeric-footer">
+                <div class="tbl-row">
+                    <a href="javascript:void(0)" class="tbl-cell return-btn">← Return to Connection Details</a>
+                    <a  href="javascript:void(0)" id="btn-connection2" class="tbl-cell color-green cont-btn swal-btn-success">Click to Connect →</a>
                 </div>
+            </div>
 
+        </section><!--.steps-numeric-block-->
 
-                <div class="tbl steps-numeric-footer">
-                    <div class="tbl-row">
-                        <a href="javascript:void(0)" class="tbl-cell return-btn">← Return to Connection Details</a>
-                        <a  href="javascript:void(0)" id="btn-connection2" class="tbl-cell color-green cont-btn swal-btn-success">Click to Connect →</a>
-                    </div>
-                </div>
-
-            </section><!--.steps-numeric-block-->
-
-        </div>
     </div>
-@stop
+</div>

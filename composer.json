@@ -8,7 +8,6 @@
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*",
         "laravelcollective/html": "5.2.*",
-        "laravelcollective/remote": "~5.0",
         "phpseclib/phpseclib": "^0.3.10",
         "arrilot/laravel-widgets": "^3.4"
     },

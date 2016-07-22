@@ -19,7 +19,7 @@
                                 <div class="item"><span class="num">1</span>Connection Details</div>
                             </li>
                             <li>
-                                <div class="item"><span class="num">2</span>Selection Of Folders</div>
+                                <div class="item"><span class="num">2</span>Select Folders</div>
                             </li>
                             <li>
                                 <div class="item"><span class="num">3</span>Third Step</div>
@@ -118,7 +118,7 @@
 
                 </div>
                 <div class="steps-numeric-inner selection-folders">
-                    <header class="steps-numeric-title">Selection Of Folders</header>
+                    <header class="steps-numeric-title">Select Folders</header>
                     <div class="col-lg-12">
                         <fieldset>
                             <div id="tree1" class="jstree jstree-1 jstree-default jstree-default-responsive"

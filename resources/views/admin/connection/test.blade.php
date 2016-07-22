@@ -2,6 +2,6 @@
 @section('content')
 <h1>test page</h1>
 
-{{ Widget::fileSystems() }}
+{{ Widget::mysqlConnection() }}
 
 @stop

@@ -159,7 +159,7 @@ return [
          /**/
         Collective\Html\HtmlServiceProvider::class,
 
-        Arrilot\Widgets\ServiceProvider::class
+        Arrilot\Widgets\ServiceProvider::class,
 
     ],
 

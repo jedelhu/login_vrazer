@@ -11,6 +11,7 @@ use Net_SFTP;
 use Net_SSH2;
 use Request;
 use Session;
+use Exception;
 
 class ConnectionController extends Controller
 {
@@ -48,27 +49,58 @@ class ConnectionController extends Controller
     }
 
     /**
-     * Validate FTP/Sftp/SSH connections and return directory listings.
+     * To connect to MySQL over the SSH connection.
      *
      * @return Response
      */
     public function mysqlcreate(CreateMysqlConnectionRequest $request)
     {
-
         $input_data = $request->all();
-        $sql = "SHOW DATABASES";
-        $link = mysqli_connect($input_data['host'], $input_data['username'], $input_data['password']) or die ('Error connecting to mysql: ' . mysqli_error($link) . '\r\n');
+        if ($input_data['type'] != "mysql") {
 
-        if (!($result = mysqli_query($link, $sql))) {
-            printf("Error: %s\n", mysqli_error($link));
-        }
-        $list = array();
-        while ($row = mysqli_fetch_row($result)) {
-            if (($row[0] != "information_schema") && ($row[0] != "mysql")) {
-                $list[] = $row[0];
+            $ssh = new Net_SSH2(trim($input_data['sshhost']), trim($input_data['sshport']));
+            try{
+            if (!$ssh->login(trim($input_data['sshusername']), trim($input_data['sshpassword']))) {
+                return (['status' => 'error', 'message' => "Login failed. Please provide valid credentials."]);
             }
+            } catch (\Exception $e) {
+                return (['status' => 'error', 'message' => "Login failed. Please provide valid credentials."]);
+            }
+
+            $output = $ssh->exec('mysql -u ' . trim($input_data['username']) . ' -p"' . trim($input_data['password']) . '" -e "SHOW DATABASES"');
+            $output = str_replace("stdin: is not a tty", "", $output);
+            $output = str_replace("Database", "", $output);
+            if(strpos(strtolower($output), 'error') != false){
+                return (['status' => 'error', 'message' => $output]);
+            }else{
+                $list = preg_split('/\s+/', trim($output));
+                return (['status' => 'success', 'list' => $list]);
+            }
+
+
+        } else {
+
+            $sql = "SHOW DATABASES";
+            try{
+            $link = mysqli_connect($input_data['host'], $input_data['username'], $input_data['password']) or die ('Error connecting to mysql: ' . mysqli_error($link) . '\r\n');
+
+            if (!($result = mysqli_query($link, $sql))) {
+                return (['status' => 'error', 'message' => mysqli_error($link)]);
+            }
+            } catch (\Exception $e) {
+                return (['status' => 'error', 'message' => "Login Failed"]);
+            }
+            $list = array();
+            while ($row = mysqli_fetch_row($result)) {
+                if (($row[0] != "information_schema") && ($row[0] != "mysql")) {
+                    $list[] = $row[0];
+                }
+            }
+            return (['status' => 'success', 'list' => $list]);
+
         }
-        return (['status' => 'success', 'list' => $list]);
+
+
     }
 
 
@@ -406,12 +438,6 @@ class ConnectionController extends Controller
     public function cmp($a, $b)
     {
         return strcmp($a['filename'], $b['filename']);
-
-//            if(strcmp($a['filename'], $b['filename']) && $a['type'] < $b['type']){
-//                return 1;
-//            }else{
-//                return 0;
-//            }
 
     }
 
