@@ -37,4 +37,8 @@ Route::group(['middleware' => 'web','prefix' => 'admin'], function () {
     Route::post('connection', 'ConnectionController@create');
     Route::get('mysqlconnection', 'ConnectionController@mysql');
     Route::post('mysqlconnection', 'ConnectionController@mysqlcreate');
+    Route::get('rootpath', 'ConnectionController@rootPath');
 });
+
+
+

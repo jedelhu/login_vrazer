@@ -22,6 +22,7 @@
          */
         public function rules() {
 
+
             return [
                 'host' => 'required',
                 'username' => 'required',

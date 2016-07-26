@@ -7,11 +7,11 @@ use App\Http\Requests;
 use App\Http\Requests\CreateConnectionRequest;
 use App\Http\Requests\CreateMysqlConnectionRequest;
 use Crypt;
+use Exception;
 use Net_SFTP;
 use Net_SSH2;
 use Request;
 use Session;
-use Exception;
 
 class ConnectionController extends Controller
 {
@@ -48,6 +48,48 @@ class ConnectionController extends Controller
         return view('admin.connection.testt');
     }
 
+    public function rootPath()
+    {
+//        $remote_path = $_GET['remote_path'];
+//
+//        Session::put('remotepath', $remote_path);
+//
+//        $host = trim(Session::get('host'));
+//        $username = trim(Session::get('username'));
+//        $password = trim(Session::get('password'));
+//        $port = trim(Session::get('port'));
+//        $protocol = trim(Session::get('protocol'));
+//        $sitename = trim(Session::get('sitename'));
+//        $account = trim(Session::get('account'));
+//        $localpath = trim(Session::get('localpath'));
+//
+//        $host = filter_var($host, FILTER_SANITIZE_STRING);
+//        $username = filter_var($username, FILTER_SANITIZE_STRING);
+//        $port = filter_var($port, FILTER_SANITIZE_STRING);
+//        $protocol = filter_var($protocol, FILTER_SANITIZE_STRING);
+//        $sitename = filter_var($sitename, FILTER_SANITIZE_STRING);
+//        $account = filter_var($account, FILTER_SANITIZE_STRING);
+//        $localpath = filter_var($localpath, FILTER_SANITIZE_STRING);
+//        $remote_path = filter_var($remote_path, FILTER_SANITIZE_STRING);
+//
+//        $command = 'php /root/resources/backups/backup.php --username=' . $username . ' --password="' . $password . '" --host=' . $host . ' --sitename=' . $sitename . ' --account=' . $account . ' --remotepath=' . $remote_path . ' --localpath=/root/resources/backup_data --verbose --protocol=' . $protocol . ' --port=' . $port . '';
+//        echo $command;
+//
+//        $conn = new Connections();
+//
+//        $connection = $conn->validate_connection("sftp", "45.33.9.136", "root", "cU9dMgu3xQcyXgmP", 2222);
+//
+//        if ($connection === false) {
+//
+//            return (['status' => 'error', 'message' => 'Login failed']);
+//        } else {
+//            $result = $connection->exec($command);
+//            return (['status' => 'success', 'result' => $result]);
+//        }
+//
+        return (['status' => 'success', 'result' => '']);
+    }
+
     /**
      * To connect to MySQL over the SSH connection.
      *
@@ -59,10 +101,10 @@ class ConnectionController extends Controller
         if ($input_data['type'] != "mysql") {
 
             $ssh = new Net_SSH2(trim($input_data['sshhost']), trim($input_data['sshport']));
-            try{
-            if (!$ssh->login(trim($input_data['sshusername']), trim($input_data['sshpassword']))) {
-                return (['status' => 'error', 'message' => "Login failed. Please provide valid credentials."]);
-            }
+            try {
+                if (!$ssh->login(trim($input_data['sshusername']), trim($input_data['sshpassword']))) {
+                    return (['status' => 'error', 'message' => "Login failed. Please provide valid credentials."]);
+                }
             } catch (\Exception $e) {
                 return (['status' => 'error', 'message' => "Login failed. Please provide valid credentials."]);
             }
@@ -70,9 +112,9 @@ class ConnectionController extends Controller
             $output = $ssh->exec('mysql -u ' . trim($input_data['username']) . ' -p"' . trim($input_data['password']) . '" -e "SHOW DATABASES"');
             $output = str_replace("stdin: is not a tty", "", $output);
             $output = str_replace("Database", "", $output);
-            if(strpos(strtolower($output), 'error') != false){
+            if (strpos(strtolower($output), 'error') != false) {
                 return (['status' => 'error', 'message' => $output]);
-            }else{
+            } else {
                 $list = preg_split('/\s+/', trim($output));
                 return (['status' => 'success', 'list' => $list]);
             }
@@ -81,12 +123,12 @@ class ConnectionController extends Controller
         } else {
 
             $sql = "SHOW DATABASES";
-            try{
-            $link = mysqli_connect($input_data['host'], $input_data['username'], $input_data['password']) or die ('Error connecting to mysql: ' . mysqli_error($link) . '\r\n');
+            try {
+                $link = mysqli_connect($input_data['host'], $input_data['username'], $input_data['password']) or die ('Error connecting to mysql: ' . mysqli_error($link) . '\r\n');
 
-            if (!($result = mysqli_query($link, $sql))) {
-                return (['status' => 'error', 'message' => mysqli_error($link)]);
-            }
+                if (!($result = mysqli_query($link, $sql))) {
+                    return (['status' => 'error', 'message' => mysqli_error($link)]);
+                }
             } catch (\Exception $e) {
                 return (['status' => 'error', 'message' => "Login Failed"]);
             }
@@ -111,10 +153,19 @@ class ConnectionController extends Controller
      */
     public function create(CreateConnectionRequest $request)
     {
-
-
         $data = $request->all();
         $dir = $request->dir;
+
+        Session::put('host', $data['host']);
+        Session::put('username', $data['username']);
+        Session::put('password', $data['password']);
+        Session::put('port', $data['port']);
+        Session::put('protocol', $data['type']);
+        Session::put('sitename', $data['username']);
+        Session::put('account', 'root');
+        Session::put('localpath', '/root/resources/backup_data');
+        Session::put('remotepath', '/root/resources/backup_data');
+
 
         $conn = new Connections();
         $folders = array();
@@ -125,17 +176,18 @@ class ConnectionController extends Controller
 
                 $connection = $conn->validate_connection($data['type'], $data['host'], $data['username'], $data['password'], $data['port']);
 
+
                 if ($connection === false) {
 
                     return (['status' => 'error', 'message' => 'Login failed']);
                 } else {
 
-                    // turn on passive mode transfers
-                    // ftp_pasv($connection, true);
-
                     if (!empty($dir)) {
 
                         $list = ftp_rawlist($connection, $request->dir);
+                        $pwd = ftp_pwd($connection);
+                        $pwd = trim($pwd) . trim($request->dir);
+
 
                         foreach ($list as $key => $folder) {
                             $info = array();
@@ -168,10 +220,11 @@ class ConnectionController extends Controller
 
                         $list = json_encode($result);
 
-                        return (['status' => 'success', 'type' => 'ftp', 'list' => $list]);
+                        return (['status' => 'success', 'type' => 'ftp', 'list' => $list, 'pwd' => $pwd]);
                     } else {
                         $data['username'] = Crypt::encrypt($data['username']);
                         $data['password'] = Crypt::encrypt($data['password']);
+                        $pwd = ftp_pwd($connection);
 
                         Connections::create($data);
                         $list = ftp_rawlist($connection, ".");
@@ -193,6 +246,7 @@ class ConnectionController extends Controller
                             }
                         }
 
+
                         if (isset($folders)) {
                             uasort($folders, array($this, 'cmp'));
                         } else {
@@ -207,7 +261,7 @@ class ConnectionController extends Controller
                         $result = $folders + $files;
                         $list = json_encode($result);
 
-                        return (['status' => 'success', 'type' => 'ftp', 'list' => $list]);
+                        return (['status' => 'success', 'type' => 'ftp', 'list' => $list, 'pwd' => $pwd]);
                     }
 
 
@@ -228,6 +282,10 @@ class ConnectionController extends Controller
 
                     $result = $connection->rawlist($request->dir);
 
+                    $pwd = $connection->exec('pwd');
+                    $pwd = trim($pwd) . '/' . trim($request->dir);
+                    $pwd = trim(str_replace('stdin: is not a tty', '', $pwd));
+
 
                     foreach ($result as $key => $value) {
                         if ($value['type'] == 2) {
@@ -239,7 +297,6 @@ class ConnectionController extends Controller
                             $array2[$key]['type'] = 1;
                         }
                     }
-//                        print_r($result);exit();
                     if (isset($array1)) {
                         uasort($array1, array($this, 'cmp'));
                     } else {
@@ -251,8 +308,6 @@ class ConnectionController extends Controller
                         $array2 = array();
                     }
                     $result = $array1 + $array2;
-
-//                        uasort($result, array($this,'type'));
                     $list = json_encode($result);
 
                 } else {
@@ -261,6 +316,8 @@ class ConnectionController extends Controller
 
                     Connections::create($data);
                     $result = $connection->rawlist();
+                    $pwd = $connection->exec('pwd');
+                    $pwd = trim(str_replace('stdin: is not a tty', '', $pwd));
 
                     foreach ($result as $key => $value) {
                         if ($value['type'] == 2) {
@@ -272,7 +329,6 @@ class ConnectionController extends Controller
                             $array2[$key]['type'] = 1;
                         }
                     }
-
 
                     if (isset($array1)) {
                         uasort($array1, array($this, 'cmp'));
@@ -289,7 +345,7 @@ class ConnectionController extends Controller
 
                 }
 
-                return (['status' => 'success', 'list' => $list]);
+                return (['status' => 'success', 'list' => $list, 'pwd' => $pwd]);
             }
         } else if ($data['type'] == 'ssh') {
 
@@ -306,6 +362,9 @@ class ConnectionController extends Controller
                     $path_files = 'ls ' . trim($dir) . ' -F | grep -v /';
                     $list = $connection->exec($path_folders);
                     $list2 = $connection->exec($path_files);
+                    $pwd = $connection->exec('pwd');
+                    $pwd = trim(str_replace('stdin: is not a tty', '', $pwd));
+                    $pwd = trim($pwd) . '/' . trim($request->dir);
 
                     $list = str_replace("stdin: is not a tty", "", $list);
                     $list2 = str_replace("stdin: is not a tty", "", $list2);
@@ -343,8 +402,7 @@ class ConnectionController extends Controller
                     } else {
                         $array2 = array();
                     }
-//                        $array = array_filter($array);
-//                        $array2 = array_filter($array2);
+
                     if (empty($array)) {
                         $result = $array2;
                     } else if (empty($array2)) {
@@ -353,12 +411,10 @@ class ConnectionController extends Controller
                         $result = $array + $array2;
                     }
 
-//                        $result=$array + $array2;
-
 
                     $list = json_encode($result);
 
-                    return (['status' => 'success', 'list' => $list]);
+                    return (['status' => 'success', 'list' => $list, 'pwd' => $pwd]);
                 } else {
                     $data['username'] = Crypt::encrypt($data['username']);
                     $data['password'] = Crypt::encrypt($data['password']);
@@ -367,6 +423,8 @@ class ConnectionController extends Controller
                     $list = $connection->exec('ls -F | grep /');
                     $list2 = $connection->exec('ls -F | grep -v /');
                     $var = 0;
+                    $pwd = $connection->exec('pwd');
+                    $pwd = trim(str_replace('stdin: is not a tty', '', $pwd));
                     if (strpos($list, 'Shell access is not enabled') !== false) {
 
                         return (['status' => 'error', 'message' => $list]);
@@ -414,8 +472,6 @@ class ConnectionController extends Controller
                         } else {
                             $array2 = array();
                         }
-//                            $array = array_filter($array);
-//                            $array2 = array_filter($array2);
                         if (empty($array)) {
                             $result = $array2;
                         } else if (empty($array2)) {
@@ -428,7 +484,7 @@ class ConnectionController extends Controller
                         $list = json_encode($result);
 
 
-                        return (['status' => 'success', 'list' => $list]);
+                        return (['status' => 'success', 'list' => $list, 'pwd' => $pwd]);
                     }
                 }
             }

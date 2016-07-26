@@ -1,6 +1,10 @@
 $(function () {
     $('.selection-folders').hide();
     $('.return-btn').hide();
+    $('.return-btn2').hide();
+    $('#box-connection').hide();
+    $('#box-connection2').hide();
+    $('.completed-backups').hide();
 
     $('.return-btn').click(function (e) {
         $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
@@ -9,7 +13,26 @@ $(function () {
         $('#btn-connection').show();
         $('#btn-connection2').show();
         $('.selection-folders').hide();
+        $('#box-connection').hide();
+        $('#box-connection2').hide();
+        $('.completed-backups').hide();
         $('.return-btn').hide();
+
+    });
+    $('.return-btn2').click(function (e) {
+        $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
+        $(".steps-numeric-header-in ul li").eq(0).addClass("active");
+        $(".steps-numeric-header-in ul li").eq(2).removeClass("active");
+        $('.connection-detail').show();
+        $('#btn-connection').show();
+        $('#btn-connection2').show();
+        $('.selection-folders').hide();
+        $('.return-btn').hide();
+        $('.return-btn2').hide();
+        $('#box-connection').hide();
+        $('#box-connection2').hide();
+        $('#btn-connection').click();
+
     });
     $('.swal-btn-success').click(function (e) {
         e.preventDefault();
@@ -50,6 +73,7 @@ $(function () {
         var formURL = 'http://loginportal.vrazer.net/admin/connection';
         $('#errors').html('');
         localStorage.clear();
+        localStorage.setItem( "root", "no" );
 
         $.ajax(
             {
@@ -67,6 +91,7 @@ $(function () {
                     $('#btn-connection').hide();
                     $('.selection-folders').show();
                     $('.return-btn').show();
+                    $('#box-connection').show();
 
                     if (data.status == 'error') {
                         errorsHtml = '<ul class="alert alert-danger">';
@@ -76,7 +101,9 @@ $(function () {
                     }
                     if (data.status == 'success') {
                         var obj = jQuery.parseJSON(data.list);
-                        var treeHtml = '<ul class="jstree-container-ul">';
+                        console.log(data.pwd);
+                        localStorage.setItem("remote_path", data.pwd );
+                        var treeHtml = '<ul class="jstree-container-ul" style="margin-bottom: 20px;">';
                         var i = 1;
                         $.each(obj, function (index, element) {
 
@@ -103,7 +130,7 @@ $(function () {
                                 }
                                 else {
                                     if (element.type == 2) {
-                                        treeHtml += '<a class="folder jstree-anchor" data-id="' + element.filename + '" href="javascript:void(0);"><i style=" margin-right: 10px;" class="fa fa-caret-right" aria-hidden="true"></i></a><input  type="checkbox"  name="list[]" value="' + element.filename + '" class="liChild"><a class="folder jstree-anchor atag" data-id="' + element.filename + '" href="javascript:void(0);"><i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom "></i> ' + element.filename + '</a>';
+                                        treeHtml += '<a class="folder jstree-anchor" data-id="' + element.filename + '" href="javascript:void(0);"><i style=" margin-right: 10px;" class="fa fa-caret-right" aria-hidden="true"></i></a><input  type="checkbox"  name="list[]" value="' + element.filename + '" class="liChild"><a class="folder jstree-anchor atag" data-id="' + element.filename + '" href="javascript:void(0);"><i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ' + element.filename + '</a>';
                                     }
                                     else {
                                         treeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
@@ -240,8 +267,10 @@ $(function () {
                     url: formURL,
                     dataType: "json",
                     success: function (data) {
-
+                        var root=localStorage.getItem( "root" );
                         spinner.remove();
+                        localStorage.setItem("remote_path", data.pwd );
+                        //console.log(localStorage.getItem( "remote_path" ));
                         if (data.status == 'error') {
                             errorsHtml = '<ul class="alert alert-danger">';
                             errorsHtml += '<li>' + data.message + '</li>';
@@ -258,8 +287,11 @@ $(function () {
                                         ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false">';
                                     }
                                     else {
+                                        if(root != "yes") {
                                         ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false" style="margin-left: 64px">';
-
+                                        }else{
+                                            ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false" style="margin-left: 51px">';
+                                        }
                                     }
                                     if (data.type == 'ftp') {
 
@@ -268,7 +300,11 @@ $(function () {
                                             ctreeHtml += '<a class="folder jstree-anchor" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i style=" margin-right: 10px;" class="fa fa-caret-right" aria-hidden="true"></i></a><input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '" class="liChild"><a class="folder jstree-anchor atag" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ' + element.filename + '</a>';
                                         }
                                         else {
+                                            if(root != "yes") {
                                             ctreeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
+                                            }else{
+                                                ctreeHtml += '<input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '"><i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
+                                            }
                                         }
                                     }
                                     else {
@@ -277,7 +313,11 @@ $(function () {
                                             ctreeHtml += '<a class="folder jstree-anchor" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i style=" margin-right: 10px;" class="fa fa-caret-right" aria-hidden="true"></i></a><input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '" class="liChild"><a class="folder jstree-anchor atag" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ' + element.filename + '</a>';
                                         }
                                         else {
-                                            ctreeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
+                                            if(root != "yes") {
+                                                ctreeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
+                                            }else{
+                                                ctreeHtml += '<input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '"><i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
+                                            }
 
                                         }
                                     }
@@ -291,25 +331,53 @@ $(function () {
                             object.parent().append(ctreeHtml);
 
                             $('input.liChild').unbind('change');
-                            $('input.liChild').on('change', function () {
 
-                                //stored = localStorage.getItem('storedfolder');
 
-                                var class_name = $(this).closest('ul').attr('class');
-                                var id = $(this).closest('li').attr('id');
-                                var val = $(this).is(':checked');
-                                $('.' + class_name + ' li').find(':checkbox').each(function () {
-                                    $(this).prop('checked', false);
+                            if(root != "yes") {
+                                $('input.liChild').on('change', function () {
+                                    var class_name = $(this).closest('ul').attr('class');
+                                    var id = $(this).closest('li').attr('id');
+                                    var val = $(this).is(':checked');
+                                    $('.jstree-container-ul li').find(':checkbox').each(function () {
+                                        $(this).prop('checked', false);
+                                    });
+                                    if (val) {
+                                        $(this).prop('checked', true);
+                                    } else {
+                                        $(this).prop('checked', false);
+
+                                    }
                                 });
-                                if(val) {
-                                    $(this).prop('checked', true);
-                                }else{
-                                    $(this).prop('checked', false);
+                            }else{
+                                $('input.liChild').on('change', function () {
 
-                                }
+                                    stored = localStorage.getItem('storedfolder');
 
+                                    var id = $(this).closest('li').attr('id');
+                                    var val = $(this).is(':checked');
 
-                            });
+                                    if (stored != null) {
+                                        $('#' + id + ' ul').find(':checkbox').each(function () {
+                                            if ($(this).is(':checked') && val) {
+                                                $(this).prop('checked', true);
+                                            } else if (!$(this).is(':checked') && !val) {
+                                                $(this).prop('checked', false);
+                                            } else if ($(this).is(':checked')) {
+                                                $(this).prop('checked', false);
+                                            }
+                                            else {
+
+                                                $(this).prop('checked', true);
+                                            }
+                                        });
+
+                                    } else {
+
+                                    }
+                                    //console.log(index);
+                                });
+
+                            }
 
                         }
 
@@ -347,6 +415,70 @@ $(function () {
         }
     });
 
+    $("#box-connection").click(function () {
+        $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
+        $(".steps-numeric-header-in ul li").eq(2).addClass("active");
+        $('.tbl-cell-title h3').html('Select files and folders:');
+        $('#box-connection').hide();
+        $('#box-connection2').show();
+        $('.return-btn').hide();
+        $('.return-btn2').show();
+        var id ="";
+        $('.jstree-container-ul li').find(':checkbox').each(function () {
+            if($(this).is(':checked')){
+                id = $(this).closest('li').attr('id');
+            }
+
+        });
+        var parent_li =$("#"+id).parents('li').attr('id');
+        var class_name=$('#'+id).closest('ul').attr('class');
+        $('.'+ class_name +' > li').each(function () {
+            if($(this).attr('id') != id){
+                $(this).remove();
+            }
+
+        });
+
+
+            $("#"+id).parents('li').each(function () {
+                var parent_id = $(this).attr('id');
+                $('#'+parent_id+' > a').remove();
+                $('#'+parent_id+' > input').remove();
+
+                var ul_class = $(this).closest('ul').attr('class');
+                $('.' + ul_class + ' > li').each(function () {
+                    if ($(this).attr('id') != parent_id) {
+                        $(this).remove();
+                    }
+                });
+
+            });
+
+
+        $('#'+id).find('> :checkbox').prop('checked', false);
+        var remote_path=localStorage.getItem("remote_path");
+        if($('#'+id).find('ul').length > 0){
+            $('#'+id).find('a').first().click().click();
+            //var name_root_folder=$('#'+ id +' > a:nth-child(3)').html();
+            //name_root_folder= name_root_folder.replace('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ','');
+            //remote_path=remote_path + '/' + name_root_folder;
+            //$('#'+ id +' > a:nth-child(3)').html('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i>' + remote_path);
+
+        }else{
+            $('#'+id).find('a').first().click();
+
+        }
+        var name_root_folder=$('#'+ id +' > a:nth-child(3)').html();
+        name_root_folder= name_root_folder.replace('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ','');
+        remote_path=remote_path + '/' + name_root_folder;
+        $('#'+ id +' > a:nth-child(3)').html('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i>' + remote_path);
+        localStorage.setItem("remote_path", remote_path );
+
+        localStorage.setItem( "root", "yes" );
+
+
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+    });
     $("#btn-connection2").click(function () {
         var formData = $("#form-connection2").serialize();
 
@@ -412,6 +544,36 @@ $(function () {
                     }
                 }
             });
+    });
+
+    $("#box-connection2").click(function () {
+
+        var remote_path=localStorage.getItem("remote_path");
+        var formURL = 'http://loginportal.vrazer.net/admin/rootpath/?remote_path='+remote_path;
+        $.ajax(
+            {
+                type: "GET",
+                cache: false,
+                url: formURL,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == 'success') {
+                        $(".steps-numeric-header-in ul li").eq(2).removeClass("active");
+                        $(".steps-numeric-header-in ul li").eq(3).addClass("active");
+                        $('#btn-connection2').hide();
+                        $('.return-btn').show();
+                        $('.return-btn2').hide();
+                        $('.completed-backups').show();
+                        $('.selection-folders').hide();
+                    }
+
+                },
+                error: function (jqXhr, json, errorThrown) {
+
+                }
+            });
+
+
     });
 
 
