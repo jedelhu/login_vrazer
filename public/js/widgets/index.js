@@ -4,11 +4,13 @@ $(function () {
     $('.return-btn2').hide();
     $('#box-connection').hide();
     $('#box-connection2').hide();
+    $('#btn-connection3').hide();
     $('.completed-backups').hide();
 
     $('.return-btn').click(function (e) {
         $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
         $(".steps-numeric-header-in ul li").eq(0).addClass("active");
+        $(".steps-numeric-header-in ul li").eq(3).removeClass("active");
         $('.connection-detail').show();
         $('#btn-connection').show();
         $('#btn-connection2').show();
@@ -48,22 +50,31 @@ $(function () {
             window.location.replace(url);
         });
     });
+
+    $('.swal-btn-success2').click(function(e){
+        e.preventDefault();
+        swal({
+            title: "Creating backup!",
+            text: "Please wait!",
+            type: "success",
+        });
+    });
     //var current_url = window.location.href;
     //if (current_url == 'http://loginportal.vrazer.net/admin/mysqlconnection') {
+    var name = $("#form-connection2 input[type='radio']:checked").val();
+    if (name == 'ssh') {
+        $('.ssh-part').show();
+    } else {
+        $('.ssh-part').hide();
+    }
+    $('#form-connection2 input[type=radio][name=type]').change(function () {
         var name = $("#form-connection2 input[type='radio']:checked").val();
         if (name == 'ssh') {
             $('.ssh-part').show();
         } else {
             $('.ssh-part').hide();
         }
-        $('#form-connection2 input[type=radio][name=type]').change(function () {
-            var name = $("#form-connection2 input[type='radio']:checked").val();
-            if (name == 'ssh') {
-                $('.ssh-part').show();
-            } else {
-                $('.ssh-part').hide();
-            }
-        });
+    });
     //}
 
     $("#btn-connection").click(function () {
@@ -73,7 +84,7 @@ $(function () {
         var formURL = 'http://loginportal.vrazer.net/admin/connection';
         $('#errors').html('');
         localStorage.clear();
-        localStorage.setItem( "root", "no" );
+        localStorage.setItem("root", "no");
 
         $.ajax(
             {
@@ -101,8 +112,8 @@ $(function () {
                     }
                     if (data.status == 'success') {
                         var obj = jQuery.parseJSON(data.list);
-                        console.log(data.pwd);
-                        localStorage.setItem("remote_path", data.pwd );
+                        localStorage.setItem("remote_path", data.pwd);
+                        localStorage.setItem("type", data.type );
                         var treeHtml = '<ul class="jstree-container-ul" style="margin-bottom: 20px;">';
                         var i = 1;
                         $.each(obj, function (index, element) {
@@ -152,12 +163,12 @@ $(function () {
                             var class_name = $(this).closest('ul').attr('class');
                             var id = $(this).closest('li').attr('id');
                             var val = $(this).is(':checked');
-                                $('.' + class_name + ' li').find(':checkbox').each(function () {
-                                        $(this).prop('checked', false);
-                                });
-                            if(val) {
+                            $('.' + class_name + ' li').find(':checkbox').each(function () {
+                                $(this).prop('checked', false);
+                            });
+                            if (val) {
                                 $(this).prop('checked', true);
-                            }else{
+                            } else {
                                 $(this).prop('checked', false);
 
                             }
@@ -267,10 +278,10 @@ $(function () {
                     url: formURL,
                     dataType: "json",
                     success: function (data) {
-                        var root=localStorage.getItem( "root" );
+                        var root = localStorage.getItem("root");
                         spinner.remove();
-                        localStorage.setItem("remote_path", data.pwd );
-                        //console.log(localStorage.getItem( "remote_path" ));
+                        localStorage.setItem("remote_path", data.pwd);
+
                         if (data.status == 'error') {
                             errorsHtml = '<ul class="alert alert-danger">';
                             errorsHtml += '<li>' + data.message + '</li>';
@@ -281,15 +292,16 @@ $(function () {
                             var obj = jQuery.parseJSON(data.list);
                             var ctreeHtml = ' <ul style="display:block;" role="group" class="jstree-children">';
                             $.each(obj, function (index, element) {
+                                //console.log(index);
                                 if ((element.filename != '.' && element.filename != '..') || (element != '.' && element != '..' && data.type == 'ftp')) {
 
                                     if (element.type == 2) {
                                         ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false">';
                                     }
                                     else {
-                                        if(root != "yes") {
-                                        ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false" style="margin-left: 64px">';
-                                        }else{
+                                        if (root != "yes") {
+                                            ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false" style="margin-left: 64px">';
+                                        } else {
                                             ctreeHtml += '<li role="treeitem" id="j1_1' + index + '" class="jstree-node  jstree-leaf" aria-selected="false" style="margin-left: 51px">';
                                         }
                                     }
@@ -300,9 +312,9 @@ $(function () {
                                             ctreeHtml += '<a class="folder jstree-anchor" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i style=" margin-right: 10px;" class="fa fa-caret-right" aria-hidden="true"></i></a><input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '" class="liChild"><a class="folder jstree-anchor atag" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ' + element.filename + '</a>';
                                         }
                                         else {
-                                            if(root != "yes") {
-                                            ctreeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
-                                            }else{
+                                            if (root != "yes") {
+                                                ctreeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
+                                            } else {
                                                 ctreeHtml += '<input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '"><i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
                                             }
                                         }
@@ -313,9 +325,9 @@ $(function () {
                                             ctreeHtml += '<a class="folder jstree-anchor" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i style=" margin-right: 10px;" class="fa fa-caret-right" aria-hidden="true"></i></a><input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '" class="liChild"><a class="folder jstree-anchor atag" data-id="#' + dir + '/' + element.filename + '" href="javascript:void(0);" ><i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ' + element.filename + '</a>';
                                         }
                                         else {
-                                            if(root != "yes") {
+                                            if (root != "yes") {
                                                 ctreeHtml += '<i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
-                                            }else{
+                                            } else {
                                                 ctreeHtml += '<input type="checkbox" name="list[]" value="' + dir + '/' + element.filename + '"><i class="jstree-icon jstree-themeicon fa fa-file-o jstree-themeicon-custom filee"></i> ' + element.filename;
                                             }
 
@@ -333,7 +345,7 @@ $(function () {
                             $('input.liChild').unbind('change');
 
 
-                            if(root != "yes") {
+                            if (root != "yes") {
                                 $('input.liChild').on('change', function () {
                                     var class_name = $(this).closest('ul').attr('class');
                                     var id = $(this).closest('li').attr('id');
@@ -348,7 +360,7 @@ $(function () {
 
                                     }
                                 });
-                            }else{
+                            } else {
                                 $('input.liChild').on('change', function () {
 
                                     stored = localStorage.getItem('storedfolder');
@@ -374,7 +386,6 @@ $(function () {
                                     } else {
 
                                     }
-                                    //console.log(index);
                                 });
 
                             }
@@ -416,34 +427,42 @@ $(function () {
     });
 
     $("#box-connection").click(function () {
-        $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
-        $(".steps-numeric-header-in ul li").eq(2).addClass("active");
-        $('.tbl-cell-title h3').html('Select files and folders:');
-        $('#box-connection').hide();
-        $('#box-connection2').show();
-        $('.return-btn').hide();
-        $('.return-btn2').show();
-        var id ="";
+        var flag = 0;
+        var id = "";
         $('.jstree-container-ul li').find(':checkbox').each(function () {
-            if($(this).is(':checked')){
+            if ($(this).is(':checked')) {
                 id = $(this).closest('li').attr('id');
+                //console.log(id);
+                flag = 1;
             }
 
         });
-        var parent_li =$("#"+id).parents('li').attr('id');
-        var class_name=$('#'+id).closest('ul').attr('class');
-        $('.'+ class_name +' > li').each(function () {
-            if($(this).attr('id') != id){
-                $(this).remove();
-            }
+        if (flag) {
+            $('#errors').html("");
+            $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
+            $(".steps-numeric-header-in ul li").eq(2).addClass("active");
+            $('.tbl-cell-title h3').html('Select files and folders:');
+            $('#box-connection').hide();
+            $('#box-connection2').show();
+            $('.return-btn').hide();
+            $('.return-btn2').show();
 
-        });
+            var parent_li = $("#" + id).parents('li').attr('id');
+            //console.log(parent_li);
+            var class_name = $('#' + id).closest('ul').attr('class');
+            $('.' + class_name + ' > li').each(function () {
+                if ($(this).attr('id') != id) {
+                    $(this).remove();
+                }
+
+            });
 
 
-            $("#"+id).parents('li').each(function () {
+            $("#" + id).parents('li').each(function () {
                 var parent_id = $(this).attr('id');
-                $('#'+parent_id+' > a').remove();
-                $('#'+parent_id+' > input').remove();
+                //console.log($(this));
+                $('#' + parent_id + ' > a').remove();
+                $('#' + parent_id + ' > input').remove();
 
                 var ul_class = $(this).closest('ul').attr('class');
                 $('.' + ul_class + ' > li').each(function () {
@@ -455,31 +474,46 @@ $(function () {
             });
 
 
-        $('#'+id).find('> :checkbox').prop('checked', false);
-        var remote_path=localStorage.getItem("remote_path");
-        if($('#'+id).find('ul').length > 0){
-            $('#'+id).find('a').first().click().click();
-            //var name_root_folder=$('#'+ id +' > a:nth-child(3)').html();
-            //name_root_folder= name_root_folder.replace('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ','');
-            //remote_path=remote_path + '/' + name_root_folder;
-            //$('#'+ id +' > a:nth-child(3)').html('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i>' + remote_path);
+            $('#' + id).find('> :checkbox').prop('checked', false);
+            var remote_path = localStorage.getItem("remote_path");
 
-        }else{
-            $('#'+id).find('a').first().click();
+            var type = localStorage.getItem("type");
+            //console.log(remote_path);
+            //console.log(type);
+            if ($('#' + id).find('ul').length > 0) {
+                $('#' + id).find('a').first().click().click();
+
+            } else {
+                $('#' + id).find('a').first().click();
+
+            }
+
+            var name_root_folder = $('#' + id + ' > a:nth-child(3)').html();
+            name_root_folder = name_root_folder.replace('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ', '');
+            if (type ==  'ftp') {
+            remote_path = remote_path + name_root_folder;
+
+            }else{
+                remote_path = remote_path + '/' + name_root_folder;
+            }
+            $('#' + id + ' > a:nth-child(3)').html('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i>' + remote_path);
+            localStorage.setItem("remote_path", remote_path);
+
+            localStorage.setItem("root", "yes");
+
+
+            $("html, body").animate({scrollTop: 0}, "slow");
+        } else {
+            $("html, body").animate({scrollTop: 0}, "slow");
+            errorsHtml = '<ul class="alert alert-danger">';
+            errorsHtml += '<li>Please select any folder to proceed</li>';
+            errorsHtml += '</ul>';
+            $('#errors').html(errorsHtml);
 
         }
-        var name_root_folder=$('#'+ id +' > a:nth-child(3)').html();
-        name_root_folder= name_root_folder.replace('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i> ','');
-        remote_path=remote_path + '/' + name_root_folder;
-        $('#'+ id +' > a:nth-child(3)').html('<i class="jstree-icon jstree-themeicon fa fa-folder jstree-themeicon-custom"></i>' + remote_path);
-        localStorage.setItem("remote_path", remote_path );
-
-        localStorage.setItem( "root", "yes" );
-
-
-        $("html, body").animate({ scrollTop: 0 }, "slow");
     });
     $("#btn-connection2").click(function () {
+
         var formData = $("#form-connection2").serialize();
 
         var formURL = 'http://loginportal.vrazer.net/admin/mysqlconnection';
@@ -505,6 +539,7 @@ $(function () {
                         $(".steps-numeric-header-in ul li").eq(1).addClass("active");
                         $('.connection-detail').hide();
                         $('#btn-connection2').hide();
+                        $('#btn-connection3').show();
                         $('.selection-folders').show();
                         $('.return-btn').show();
                         $('#tree1 ul').remove();
@@ -513,7 +548,7 @@ $(function () {
                         $.each(data.list, function (i, element) {
 
                             ctreeHtml += '<li role="treeitem" id="mysql_j" class="jstree-node  jstree-leaf" aria-selected="false" style="margin-left: 0px">';
-                            ctreeHtml += '<input style="margin-right: 10px;" type="checkbox" name="list[]">' + element;
+                            ctreeHtml += '<input style="margin-right: 10px;" type="checkbox" name="list[]"><span class="database-name">' + element + '</span>';
                             ctreeHtml += '</li>';
 
                         });
@@ -544,12 +579,90 @@ $(function () {
                     }
                 }
             });
+
+
     });
 
     $("#box-connection2").click(function () {
+        var flag = 0;
+        $('.jstree-container-ul li').find(':checkbox').each(function () {
+            if ($(this).is(':checked')) {
+                flag = 1;
+            }
 
-        var remote_path=localStorage.getItem("remote_path");
-        var formURL = 'http://loginportal.vrazer.net/admin/rootpath/?remote_path='+remote_path;
+        });
+        var excludefiles='';
+        if (flag) {
+            $('#errors').html("");
+            $('.jstree-container-ul li').find(':checkbox').each(function () {
+                if ($(this).is(':checked')) {
+
+                }else{
+                    id = $(this).closest('li').attr('id');
+                    id=id.replace('j1_1', '');
+                    excludefiles +=id+'/';
+                }
+
+            });
+            excludefiles=excludefiles.slice(0,-1);
+
+            excludefiles=excludefiles.replace(/\./g,0);
+            var remote_path = localStorage.getItem("remote_path");
+            var formURL = 'http://loginportal.vrazer.net/admin/backupfiles/?remote_path=' + remote_path + '&excludefile=' + excludefiles;
+            $.ajax(
+                {
+                    type: "GET",
+                    cache: false,
+                    url: formURL,
+                    dataType: "json",
+                    success: function (data) {
+                        swal.close();
+                        if (data.status == 'success') {
+                            $(".steps-numeric-header-in ul li").eq(2).removeClass("active");
+                            $(".steps-numeric-header-in ul li").eq(3).addClass("active");
+                            $('#btn-connection2').hide();
+                            $('#box-connection2').hide();
+                            $('.return-btn').show();
+                            $('.return-btn2').hide();
+                            $('.completed-backups').show();
+                            $('.selection-folders').hide();
+                        }
+
+                    },
+                    error: function (jqXhr, json, errorThrown) {
+
+                    }
+                });
+
+        } else {
+            swal.close();
+            $("html, body").animate({scrollTop: 0}, "slow");
+            errorsHtml = '<ul class="alert alert-danger">';
+            errorsHtml += '<li>Please select any folder to proceed</li>';
+            errorsHtml += '</ul>';
+            $('#errors').html(errorsHtml);
+
+        }
+
+
+    });
+
+    $("#btn-connection3").click(function () {
+        var flag = 0;
+        $("#tree1").find(':checkbox').each(function () {
+            if ($(this).is(':checked')) {
+                flag = 1;
+            }
+
+        });
+        if (flag) {
+        $("#tree1").find(':checkbox').each(function () {
+            if ($(this).is(':checked')) {
+                db_name = $(this).find('+ .database-name').text();
+            }
+        });
+
+        var formURL = 'http://loginportal.vrazer.net/admin/backupdb/?db_name=' + db_name;
         $.ajax(
             {
                 type: "GET",
@@ -557,23 +670,32 @@ $(function () {
                 url: formURL,
                 dataType: "json",
                 success: function (data) {
+                    swal.close();
                     if (data.status == 'success') {
-                        $(".steps-numeric-header-in ul li").eq(2).removeClass("active");
-                        $(".steps-numeric-header-in ul li").eq(3).addClass("active");
+                        $(".steps-numeric-header-in ul li").eq(1).removeClass("active");
+                        $(".steps-numeric-header-in ul li").eq(2).addClass("active");
                         $('#btn-connection2').hide();
-                        $('.return-btn').show();
-                        $('.return-btn2').hide();
-                        $('.completed-backups').show();
+                        $('#btn-connection3').hide();
                         $('.selection-folders').hide();
+                        $('.completed-backups').show();
+                        $('.return-btn').show();
                     }
 
                 },
                 error: function (jqXhr, json, errorThrown) {
-
+                    swal.close();
                 }
             });
 
+        } else {
+            swal.close();
+            $("html, body").animate({scrollTop: 0}, "slow");
+            errorsHtml = '<ul class="alert alert-danger">';
+            errorsHtml += '<li>Please select any database to proceed</li>';
+            errorsHtml += '</ul>';
+            $('#errors').html(errorsHtml);
 
+        }
     });
 
 

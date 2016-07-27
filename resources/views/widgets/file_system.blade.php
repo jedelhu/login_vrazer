@@ -143,7 +143,7 @@
                     <a href="javascript:void(0)" class="tbl-cell return-btn2">← Return to select root folder.</a>
                     <a  href="javascript:void(0)" id="btn-connection" class="tbl-cell color-green cont-btn swal-btn-success">Click to Connect →</a>
                     <a  href="javascript:void(0)" id="box-connection" class="tbl-cell color-green cont-btn">Click to select files and folders →</a>
-                    <a  href="javascript:void(0)" id="box-connection2" class="tbl-cell color-green cont-btn">Create Backup →</a>
+                    <a  href="javascript:void(0)" id="box-connection2" class="tbl-cell color-green cont-btn swal-btn-success2">Create Backup →</a>
                 </div>
             </div>
 

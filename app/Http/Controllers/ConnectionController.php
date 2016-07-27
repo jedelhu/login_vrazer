@@ -48,46 +48,87 @@ class ConnectionController extends Controller
         return view('admin.connection.testt');
     }
 
-    public function rootPath()
+    public function backupFiles()
     {
-//        $remote_path = $_GET['remote_path'];
-//
-//        Session::put('remotepath', $remote_path);
-//
-//        $host = trim(Session::get('host'));
-//        $username = trim(Session::get('username'));
-//        $password = trim(Session::get('password'));
-//        $port = trim(Session::get('port'));
-//        $protocol = trim(Session::get('protocol'));
-//        $sitename = trim(Session::get('sitename'));
-//        $account = trim(Session::get('account'));
-//        $localpath = trim(Session::get('localpath'));
-//
-//        $host = filter_var($host, FILTER_SANITIZE_STRING);
-//        $username = filter_var($username, FILTER_SANITIZE_STRING);
-//        $port = filter_var($port, FILTER_SANITIZE_STRING);
-//        $protocol = filter_var($protocol, FILTER_SANITIZE_STRING);
-//        $sitename = filter_var($sitename, FILTER_SANITIZE_STRING);
-//        $account = filter_var($account, FILTER_SANITIZE_STRING);
-//        $localpath = filter_var($localpath, FILTER_SANITIZE_STRING);
-//        $remote_path = filter_var($remote_path, FILTER_SANITIZE_STRING);
-//
-//        $command = 'php /root/resources/backups/backup.php --username=' . $username . ' --password="' . $password . '" --host=' . $host . ' --sitename=' . $sitename . ' --account=' . $account . ' --remotepath=' . $remote_path . ' --localpath=/root/resources/backup_data --verbose --protocol=' . $protocol . ' --port=' . $port . '';
-//        echo $command;
-//
-//        $conn = new Connections();
-//
-//        $connection = $conn->validate_connection("sftp", "45.33.9.136", "root", "cU9dMgu3xQcyXgmP", 2222);
-//
-//        if ($connection === false) {
-//
-//            return (['status' => 'error', 'message' => 'Login failed']);
-//        } else {
-//            $result = $connection->exec($command);
-//            return (['status' => 'success', 'result' => $result]);
-//        }
-//
-        return (['status' => 'success', 'result' => '']);
+        $remote_path = $_GET['remote_path'];
+        $exclude_files = $_GET['excludefile'];
+        $exclude_files = str_replace(0, '.', $exclude_files);
+        $exclude_files = str_replace('/', '|', $exclude_files);
+
+
+        Session::put('remotepath', $remote_path);
+
+        $host = trim(Session::get('host'));
+        $username = trim(Session::get('username'));
+        $password = trim(Session::get('password'));
+        $port = trim(Session::get('port'));
+        $protocol = trim(Session::get('protocol'));
+        $sitename = trim(Session::get('sitename'));
+        $account = trim(Session::get('account'));
+        $localpath = trim(Session::get('localpath'));
+
+        $host = filter_var($host, FILTER_SANITIZE_STRING);
+        $username = filter_var($username, FILTER_SANITIZE_STRING);
+        $port = filter_var($port, FILTER_SANITIZE_STRING);
+        $protocol = filter_var($protocol, FILTER_SANITIZE_STRING);
+        $sitename = filter_var($sitename, FILTER_SANITIZE_STRING);
+        $account = filter_var($account, FILTER_SANITIZE_STRING);
+        $localpath = filter_var($localpath, FILTER_SANITIZE_STRING);
+        $remote_path = filter_var($remote_path, FILTER_SANITIZE_STRING);
+
+        $command = 'php /root/resources/backups/backup.php --username=' . $username . ' --password=\'' . $password . '\' --host=' . $host . ' --sitename=' . $sitename . ' --account=' . $account . ' --remotepath=' . $remote_path . ' --localpath=/root/resources/backup_data --verbose --protocol=' . $protocol . ' --port=' . $port . ' --exclusions_list=\'' . $exclude_files . '\'';
+        $conn = new Connections();
+
+        $connection = $conn->validate_connection("sftp", "45.33.9.136", "root", "cU9dMgu3xQcyXgmP", 2222);
+        if ($connection === false) {
+            return (['status' => 'error', 'message' => 'Login failed']);
+        } else {
+                $result = $connection->exec($command);
+                return (['status' => 'success', 'result' => $result]);
+
+        }
+
+    }
+    public function backupDB()
+    {
+        $db_name = $_GET['db_name'];
+        $host = trim(Session::get('mysql_host'));
+        $username = trim(Session::get('mysql_username'));
+        $password = trim(Session::get('mysql_password'));
+        $port = trim(Session::get('mysql_port'));
+        $sshhost = trim(Session::get('mysql_sshhost'));
+        $sshusername = trim(Session::get('mysql_sshusername'));
+        $sshpassword = trim(Session::get('mysql_sshpassword'));
+        $sshport = trim(Session::get('mysql_sshport'));
+        $sitename =$db_name;
+        $account = trim(Session::get('mysql_account'));
+        $localpath = trim(Session::get('mysql_localpath'));
+
+        $host = filter_var($host, FILTER_SANITIZE_STRING);
+        $username = filter_var($username, FILTER_SANITIZE_STRING);
+        $port = filter_var($port, FILTER_SANITIZE_STRING);
+        $sshhost = filter_var($sshhost, FILTER_SANITIZE_STRING);
+        $sshusername = filter_var($sshusername, FILTER_SANITIZE_STRING);
+        $sshport = filter_var($sshport, FILTER_SANITIZE_STRING);
+        $sitename = filter_var($sitename, FILTER_SANITIZE_STRING);
+        $account = filter_var($account, FILTER_SANITIZE_STRING);
+        $localpath = filter_var($localpath, FILTER_SANITIZE_STRING);
+
+        $command = 'php /root/resources/backups/database_backup.php --sitename=' . $sitename . ' --account=root --method=ssh --db_name=' . $db_name . ' --mysql_username=' . $username . ' --mysql_password=\'' . $password . '\' --mysql_host=' . $host . ' --mysql_port=' . $port . ' --localpath=' . $localpath . ' --verbose --ssh_username=' . $sshusername . ' --ssh_password=\'' . $sshpassword . '\' --ssh_host=' . $sshhost . '  --ssh_port=' . $sshport . '';
+//        echo $command;exit;
+
+//        php /root/resources/backups/database_backup.php --sitename=sandbox_test --account=root --method=ssh --db_name=sandbox_test --mysql_username=sandbox_test --mysql_password='ZsuW{]Q;oCP9' --mysql_host=localhost --mysql_port=3306 --localpath=/root/resources/backup_data --verbose --ssh_username=sandbox --ssh_password=',K2SPs8~vBC-$kiO' --ssh_host=host.vrazer.com  --ssh_port=2222
+        $conn = new Connections();
+
+        $connection = $conn->validate_connection("sftp", "45.33.9.136", "root", "cU9dMgu3xQcyXgmP", 2222);
+        if ($connection === false) {
+            return (['status' => 'error', 'message' => 'Login failed']);
+        } else {
+            $result = $connection->exec($command);
+            return (['status' => 'success', 'result' => $result]);
+
+        }
+
     }
 
     /**
@@ -98,6 +139,17 @@ class ConnectionController extends Controller
     public function mysqlcreate(CreateMysqlConnectionRequest $request)
     {
         $input_data = $request->all();
+        Session::put('mysql_host', $input_data['host']);
+        Session::put('mysql_username', $input_data['username']);
+        Session::put('mysql_password', $input_data['password']);
+        Session::put('mysql_port', $input_data['port']);
+        Session::put('mysql_sshhost', $input_data['sshhost']);
+        Session::put('mysql_sshusername', $input_data['sshusername']);
+        Session::put('mysql_sshpassword', $input_data['sshpassword']);
+        Session::put('mysql_sshport', $input_data['sshport']);
+        Session::put('mysql_account', 'root');
+        Session::put('mysql_localpath', '/root/resources/backup_db');
+
         if ($input_data['type'] != "mysql") {
 
             $ssh = new Net_SSH2(trim($input_data['sshhost']), trim($input_data['sshport']));
@@ -118,7 +170,6 @@ class ConnectionController extends Controller
                 $list = preg_split('/\s+/', trim($output));
                 return (['status' => 'success', 'list' => $list]);
             }
-
 
         } else {
 
@@ -194,17 +245,20 @@ class ConnectionController extends Controller
                             $current = preg_split("/[\s]+/", $folder, 9, PREG_SPLIT_NO_EMPTY);
                             $info['perms'] = $current[0];
                             $info['name'] = str_replace('//', '', $current[8]);
+//                            print_r($current);
+
                             sort($list);
                             if ($info['name'] != '.' && $info['name'] != '..') {
                                 if ($this->get_type($info['perms']) == "folder") {
-                                    $folders[$key . $info['name']]['filename'] = $info['name'];
-                                    $folders[$key . $info['name']]['type'] = 2;
+                                    $folders[$info['name']]['filename'] = $info['name'];
+                                    $folders[$info['name']]['type'] = 2;
                                 } else {
-                                    $files[$key . $info['name']]['filename'] = $info['name'];
-                                    $files[$key . $info['name']]['type'] = 1;
+                                    $files[$info['name']]['filename'] = $info['name'];
+                                    $files[$info['name']]['type'] = 1;
                                 }
                             }
                         }
+
                         if (isset($folders)) {
                             uasort($folders, array($this, 'cmp'));
                         } else {
@@ -216,9 +270,11 @@ class ConnectionController extends Controller
                         } else {
                             $files = array();
                         }
-                        $result = $folders + $files;
 
+                        $result = $folders + $files;
+//                        print_r($result);exit;
                         $list = json_encode($result);
+
 
                         return (['status' => 'success', 'type' => 'ftp', 'list' => $list, 'pwd' => $pwd]);
                     } else {
@@ -377,8 +433,8 @@ class ConnectionController extends Controller
                         $dirs = explode('/', $dirs);
                         if (!empty(trim(trim($dirs[0])))) {
 
-                            $array[$inc . $dirs[0]]['filename'] = trim($dirs[0]);
-                            $array[$inc . $dirs[0]]['type'] = 2;
+                            $array[$dirs[0]]['filename'] = trim($dirs[0]);
+                            $array[$dirs[0]]['type'] = 2;
                             $inc = $inc + 1;
                         }
                     }
@@ -392,8 +448,8 @@ class ConnectionController extends Controller
                     foreach ($list2 as $key => $dirs) {
                         if (!empty(trim($dirs))) {
 
-                            $array2[$inc . $dirs]['filename'] = trim($dirs);
-                            $array2[$inc . $dirs]['type'] = 1;
+                            $array2[$dirs]['filename'] = trim($dirs);
+                            $array2[$dirs]['type'] = 1;
                             $inc = $inc + 1;
                         }
                     }

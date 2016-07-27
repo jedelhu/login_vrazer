@@ -19,6 +19,9 @@
                         <li>
                             <div class="item"><span class="num">2</span>List of Databases</div>
                         </li>
+                        <li>
+                            <div class="item"><span class="num">2</span>Completed backup</div>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -51,7 +54,7 @@
                                 <label class="form-label" for="exampleInput">MySQL Host Address</label>
                                 <input name="host" type="text" class="form-control"
                                        id="exampleInputEmail1"
-                                       name="exampleInputEmail1" placeholder="Enter Mysql Host Address">
+                                       name="exampleInputEmail1" placeholder="Enter Mysql Host Address" value="localhost">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
@@ -59,14 +62,14 @@
                                 <label class="form-label" for="exampleInputEmail1">MySQL Username</label>
                                 <input name="username" type="text" class="form-control"
                                        id="exampleInputPassword1"
-                                       name="exampleInputPassword1" placeholder="Enter MySQL Username" >
+                                       name="exampleInputPassword1" placeholder="Enter MySQL Username" value="sandbox_test">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
                             <fieldset class="form-group">
                                 <label class="form-label" for="exampleInputPassword1">MySQL Password</label>
                                 <input id="hide-show-password" type="password" name="password"
-                                       placeholder="Enter MySQL Password" class="form-control" >
+                                       placeholder="Enter MySQL Password" class="form-control" value="ZsuW{]Q;oCP9">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
@@ -83,7 +86,7 @@
                                 <label class="form-label" for="exampleInput">SSH Host Address</label>
                                 <input name="sshhost" type="text" class="form-control"
                                        id="exampleInputEmail1"
-                                       name="exampleInputEmail1" placeholder="Enter SSH Host Address">
+                                       name="exampleInputEmail1" placeholder="Enter SSH Host Address" value="host.vrazer.com">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
@@ -91,14 +94,14 @@
                                 <label class="form-label" for="exampleInputEmail1">SSH Username</label>
                                 <input name="sshusername" type="text" class="form-control"
                                        id="exampleInputPassword1"
-                                       name="exampleInputPassword1" placeholder="Enter SSH Username" >
+                                       name="exampleInputPassword1" placeholder="Enter SSH Username" value="sandbox">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
                             <fieldset class="form-group">
                                 <label class="form-label" for="exampleInputPassword1">SSH Password</label>
                                 <input id="hide-show-password" type="password" name="sshpassword"
-                                       placeholder="Enter SSH Password" class="form-control" >
+                                       placeholder="Enter SSH Password" class="form-control" value=",K2SPs8~vBC-$kiO">
                             </fieldset>
                         </div>
                         <div class="col-lg-3">
@@ -124,12 +127,16 @@
                     </fieldset>
                 </div>
             </div>
+            <div class="steps-numeric-inner completed-backups">
+                <h1 class="backup-heading">Your database backup is completed successfully</h1>
+            </div>
 
 
             <div class="tbl steps-numeric-footer">
                 <div class="tbl-row">
                     <a href="javascript:void(0)" class="tbl-cell return-btn">← Return to Connection Details</a>
                     <a  href="javascript:void(0)" id="btn-connection2" class="tbl-cell color-green cont-btn swal-btn-success">Click to Connect →</a>
+                    <a  href="javascript:void(0)" id="btn-connection3" class="tbl-cell color-green cont-btn swal-btn-success2">Create Backup →</a>
                 </div>
             </div>
 
